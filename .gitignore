@@ -1,0 +1,19 @@
+# --- 运行时数据（仅本机，不入库） ---
+data/
+workspaces/
+logs/
+book/
+
+# --- 依赖与构建 ---
+node_modules/
+
+# --- 临时产物 ---
+.tmp-*
+*.log
+.px.mjs
+web/_px.html
+
+# --- 系统 ---
+.DS_Store
+Thumbs.db
+desktop.ini

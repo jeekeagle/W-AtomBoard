@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>阅读 · W-AtomBoard</title>
+<link rel="stylesheet" href="/preview.css" />
+</head>
+<body>
+<div class="read-progress" aria-hidden="true"><i id="read-progress"></i></div>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">W-AtomBoard</a>
+    <span class="crumb" id="crumb">阅读</span>
+    <div class="actions">
+      <button class="btn ghost toc-toggle" id="toc-toggle" type="button">目录</button>
+      <button class="btn ghost" id="copy-path" type="button">复制路径</button>
+      <button class="btn ghost" id="open-system" type="button">系统打开</button>
+      <button class="btn" id="back" type="button">返回看板</button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="toc" id="toc" aria-label="文档目录">
+    <p class="toc-head">目录 / Contents</p>
+    <nav id="toc-nav"></nav>
+  </aside>
+
+  <article class="paper" id="article" aria-live="polite">
+    <p class="state">正在载入文档…</p>
+  </article>
+</main>
+
+<footer class="page-foot">
+  <span>W-AtomBoard · Reading Mode</span>
+  <span id="foot-path"></span>
+</footer>
+
+<script src="/vendor/marked.umd.js"></script>
+<script src="/vendor/purify.min.js"></script>
+<script src="/preview.js"></script>
+</body>
+</html>

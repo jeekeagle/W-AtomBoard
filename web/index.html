@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="white" data-style="editorial">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>W-AtomBoard — 写作原子看板</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<nav>
+  <div class="shell nav-inner">
+    <a class="brand" href="/">W-AtomBoard</a>
+    <div class="nav-links">
+      <button class="nav-link strong" id="cfg-open">系统设置</button>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="shell head-inner">
+    <div class="title-block">
+      <p class="eyebrow">Writing Board</p>
+      <h1>写作原子看板</h1>
+      <p class="subtitle" id="subtitle">一个 Atom 是一个选题或章节：交给 Codex 写，稿件落盘，字数回流。</p>
+    </div>
+    <div class="figures" id="figures"></div>
+  </div>
+</header>
+
+<div class="filters-bar">
+  <div class="shell filters" id="filters"></div>
+</div>
+
+<main id="board">
+  <div class="shell board-inner" id="board-inner"></div>
+</main>
+
+<!-- 新建 Atom -->
+<div class="modal" id="modal" aria-hidden="true">
+  <form class="modal-card" id="new-form">
+    <p class="eyebrow">New Chapter</p>
+    <h2>新建选题 / 章节</h2>
+
+    <div class="field">
+      <input type="text" id="n-title" placeholder=" " autocomplete="off" required />
+      <label for="n-title">选题 / 章节名</label>
+    </div>
+
+    <div class="field">
+      <select id="n-project"></select>
+      <label>所属项目</label>
+    </div>
+
+    <div class="field">
+      <textarea id="n-body" rows="4" placeholder=" "></textarea>
+      <label>写作要求（读者、角度、语气、不写什么）</label>
+    </div>
+
+    <div class="field">
+      <input type="text" id="n-target" placeholder=" " autocomplete="off" />
+      <label for="n-target">交付目标（如「一篇 3000 字、可发布的公众号长文」）</label>
+    </div>
+
+    <div class="field">
+      <input type="number" id="n-word-goal" min="0" step="100" placeholder=" " autocomplete="off" />
+      <label for="n-word-goal">目标字数（留空 = 暂不设目标）</label>
+    </div>
+
+    <div class="field">
+      <input type="text" id="n-mentions" placeholder=" " autocomplete="off" />
+      <label>执行体（@ 提及，如 @codex、@skill:baoyu-diagram）</label>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <select id="n-priority">
+          <option value="low">低</option>
+          <option value="normal" selected>普通</option>
+          <option value="high">高</option>
+          <option value="urgent">紧急</option>
+        </select>
+        <label>优先级</label>
+      </div>
+      <div class="field">
+        <select id="n-status"></select>
+        <label>初始状态</label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="n-cancel">取消</button>
+      <button type="submit" class="btn">创建</button>
+    </div>
+  </form>
+</div>
+
+<!-- 系统设置（整页） -->
+<div class="settings-page" id="settings-page" aria-hidden="true">
+  <div class="settings-head">
+    <div class="shell settings-head-inner">
+      <div>
+        <p class="eyebrow">System</p>
+        <h2>系统设置</h2>
+      </div>
+      <button type="button" class="btn ghost" id="s-close">关闭</button>
+    </div>
+  </div>
+
+  <div class="shell settings-body">
+    <nav class="settings-tabs" id="s-tabs" aria-label="设置分区">
+      <button type="button" data-tab="codex" aria-pressed="true">Codex</button>
+      <button type="button" data-tab="style" aria-pressed="false">风格</button>
+      <button type="button" data-tab="transitions" aria-pressed="false">拖动逻辑</button>
+      <button type="button" data-tab="projects" aria-pressed="false">项目</button>
+      <button type="button" data-tab="data" aria-pressed="false">数据</button>
+    </nav>
+
+    <div class="settings-content">
+      <!-- Codex -->
+      <section class="s-panel" data-panel="codex">
+        <div class="s-panel-head">
+          <h3>Codex 连接</h3>
+          <p>看板上的执行体默认使用这里配置的 Codex。留空路径时按「配置 → 桌面版内置 → PATH」自动定位。</p>
+        </div>
+
+        <div class="field">
+          <input type="text" id="c-bin" placeholder=" " autocomplete="off" />
+          <label>Codex 可执行路径（留空 = 自动定位）</label>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <input type="text" id="c-model" placeholder=" " autocomplete="off" />
+            <label>模型（留空 = 跟随 config.toml）</label>
+          </div>
+          <div class="field">
+            <select id="c-sandbox">
+              <option value="approve-for-me">可写 + 自动审批</option>
+              <option value="workspace-write">可写沙箱</option>
+              <option value="read-only">只读</option>
+              <option value="danger-full-access">完全放开</option>
+            </select>
+            <label>沙箱模式</label>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <input type="number" id="c-timeout" min="30" step="30" />
+            <label>执行超时（秒）</label>
+          </div>
+          <div class="field">
+            <input type="number" id="c-port" min="1" max="65535" />
+            <label>看板端口</label>
+          </div>
+        </div>
+
+        <div class="test-box">
+          <div class="s-inline">
+            <button type="button" class="btn ghost" id="c-test">测试连接</button>
+            <button type="button" class="btn" id="c-save">保存</button>
+          </div>
+          <pre class="test-out" id="c-test-out">尚未测试</pre>
+        </div>
+      </section>
+
+      <!-- 风格 -->
+      <section class="s-panel" data-panel="style" hidden>
+        <div class="s-panel-head">
+          <h3>风格与主题</h3>
+          <p>风格管形状、动效与强调色；主题管底色与墨色。两者可自由组合。</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <select id="s-style"></select>
+            <label>界面风格</label>
+          </div>
+          <div class="field">
+            <select id="s-theme"></select>
+            <label>主题</label>
+          </div>
+        </div>
+
+        <div class="s-swatches" id="s-swatches"></div>
+
+        <div class="s-actions">
+          <button type="button" class="btn" id="s-style-save">保存为默认</button>
+        </div>
+      </section>
+
+      <!-- 拖动逻辑 -->
+      <section class="s-panel" data-panel="transitions" hidden>
+        <div class="s-panel-head">
+          <h3>拖动逻辑</h3>
+          <p>每条规则对应「卡片从一个状态拖到另一个状态」。可配置提示词与允许调用的 Skill；开启「自动执行」后，拖动完成即派发一次执行。</p>
+        </div>
+        <div class="transitions" id="s-transitions"></div>
+        <div class="s-actions">
+          <button type="button" class="btn" id="s-transitions-save">保存全部规则</button>
+        </div>
+      </section>
+
+      <!-- 项目 -->
+      <section class="s-panel" data-panel="projects" hidden>
+        <div class="s-panel-head">
+          <h3>项目管理</h3>
+          <p>每个项目对应一个工作目录，其中每个 Atom 是一个子目录。归档不会删除数据。</p>
+        </div>
+        <div class="proj-list" id="proj-list"></div>
+        <div class="proj-new">
+          <div class="field"><input type="text" id="p-name" placeholder=" " autocomplete="off" /><label for="p-name">新建项目名称</label></div>
+          <button class="btn" id="p-add">新建</button>
+        </div>
+      </section>
+
+      <!-- 数据 -->
+      <section class="s-panel" data-panel="data" hidden>
+        <div class="s-panel-head">
+          <h3>本体与日志</h3>
+          <p>这些文件是跨 Agent 的共享事实来源：任何 Agent 先读它们，再操作看板。</p>
+        </div>
+        <div class="data-paths" id="s-paths"></div>
+        <div class="s-actions">
+          <button type="button" class="btn ghost" id="s-view-ontology">查看本体</button>
+          <button type="button" class="btn ghost" id="s-view-log">查看日志</button>
+          <button type="button" class="btn" id="s-sync">同步本体与日志</button>
+        </div>
+        <pre class="test-out" id="s-data-out">就绪</pre>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside id="drawer" aria-hidden="true">
+  <div class="aside-head">
+    <div class="aside-top">
+      <p class="eyebrow" id="d-cid"></p>
+      <div class="aside-top-actions">
+        <button class="btn ghost" id="d-open-folder" type="button">打开目录</button>
+        <button class="btn" id="d-run" type="button" title="为这个 Atom 派发一次 Codex 执行">执行 Codex</button>
+        <button class="atom-delete" id="d-delete" type="button">删除</button>
+        <button class="drawer-close" id="d-close-top" type="button" aria-label="关闭详情" title="关闭（Esc）">×</button>
+      </div>
+    </div>
+    <h2 id="d-title"></h2>
+    <div class="card-meta d-meta" id="d-meta">
+      <select id="d-status" class="meta-status" aria-label="Atom 状态"></select>
+      <span id="d-meta-extra"></span>
+    </div>
+  </div>
+
+  <div class="atom-layout">
+    <div class="aside-body atom-main">
+      <details class="atom-props">
+        <summary>属性</summary>
+        <div class="props-body">
+          <div class="section">
+            <p class="section-label">描述</p>
+            <p id="d-body"></p>
+          </div>
+          <div class="section">
+            <p class="section-label">目标 Target</p>
+            <div class="target-edit">
+              <input type="text" id="d-target" placeholder="例如：形成一份可评审的设计文档" autocomplete="off" />
+              <button class="btn ghost" id="d-target-save" type="button">保存目标</button>
+            </div>
+          </div>
+          <div class="section">
+            <p class="section-label">字数</p>
+            <div class="word-block" id="d-words"></div>
+            <div class="target-edit">
+              <input type="number" id="d-word-goal" min="0" step="100" placeholder="目标字数" autocomplete="off" />
+              <button class="btn ghost" id="d-word-goal-save" type="button">保存字数目标</button>
+            </div>
+          </div>
+          <div class="section">
+            <p class="section-label">所属项目</p>
+            <select id="d-project"></select>
+          </div>
+          <div class="section">
+            <p class="section-label">工作目录</p>
+            <div class="folder-row" id="d-folder"></div>
+          </div>
+          <div class="section">
+            <p class="section-label">关联</p>
+            <div id="d-links"></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="timeline-fold" open>
+        <summary>时间线 <span class="section-hint">最新在上</span></summary>
+        <ul class="tl" id="d-tl"></ul>
+      </details>
+    </div>
+
+    <!-- 中间：内嵌阅读区（默认显示工作说明） -->
+    <section class="reader-pane" id="d-reader-pane" aria-label="成果阅读区">
+      <div class="reader-bar">
+        <span class="reader-path" id="d-reader-path" title="阅读区">工作说明</span>
+        <button class="btn ghost" id="d-reader-clear" type="button" hidden>返回概览</button>
+      </div>
+      <div class="reader-overview" id="d-reader-overview"></div>
+      <iframe class="reader-frame" id="d-reader-frame" title="成果阅读" hidden></iframe>
+    </section>
+
+    <div class="artifact-pane">
+      <div class="artifact-head">
+        <div>
+          <p class="section-label">成果</p>
+          <p class="artifact-hint">文件来自当前 Atom 工作目录，标注产生者与阶段。</p>
+        </div>
+        <button class="btn ghost" id="d-artifacts-refresh" type="button">刷新</button>
+      </div>
+      <div class="artifact-list" id="d-artifacts"></div>
+    </div>
+  </div>
+
+  <div class="ctl ctl-log">
+    <div class="field">
+      <input type="text" id="d-log" placeholder=" " autocomplete="off"
+        title="手动往这个 Atom 的时间线里添加一条事件，不会触发 Codex" />
+      <label for="d-log">手动记录一条时间线事件（不触发 Codex）</label>
+    </div>
+    <button class="btn ghost" id="d-log-add" type="button">添加</button>
+    <button class="btn ghost" id="d-close">关闭</button>
+  </div>
+</aside>
+
+<!-- 项目资源：本地文件 + 得到大脑同步文档 -->
+<aside id="resource-drawer" aria-hidden="true">
+  <div class="aside-head">
+    <div class="aside-top">
+      <p class="eyebrow">Project Resources</p>
+      <button class="atom-delete" id="r-close" type="button">关闭</button>
+    </div>
+    <h2 id="r-title">项目资源</h2>
+    <div class="resource-meta" id="r-meta"></div>
+    <div class="resource-actions">
+      <button class="btn ghost" id="r-open-folder" type="button">打开项目目录</button>
+      <button class="btn ghost" id="r-export-manuscript" type="button">导出全书稿</button>
+      <button class="btn" id="r-sync" type="button">同步得到大脑</button>
+    </div>
+  </div>
+  <div class="aside-body resource-body">
+    <p class="resource-status" id="r-status"></p>
+    <section class="res-group">
+      <div class="res-group-head"><h3>本地资源</h3><span id="r-local-count"></span></div>
+      <div id="r-local"></div>
+    </section>
+    <section class="res-group">
+      <div class="res-group-head"><h3>得到大脑文档</h3><span id="r-getnote-count"></span></div>
+      <div id="r-getnote"></div>
+    </section>
+  </div>
+</aside>
+
+<!-- 进度状态：左下角按钮 + 左侧抽屉 -->
+  <div class="progress-dock" id="progress-dock">
+    <button type="button" class="progress-fab" id="progress-fab" aria-expanded="false" aria-controls="progress-drawer" title="进度状态">
+      <span class="progress-fab-dot" id="progress-fab-dot"></span>
+      <span class="progress-fab-label">进度状态</span>
+      <span class="progress-fab-count" id="progress-fab-count">0</span>
+    </button>
+    <button type="button" class="progress-fab-pin" id="progress-fab-pin" aria-label="固定展开进度按钮" aria-pressed="false" title="固定展开">›</button>
+  </div>
+
+<div class="progress-drawer" id="progress-drawer" aria-hidden="true" aria-label="Codex 执行进度状态">
+  <div class="progress-head">
+    <div>
+      <p class="eyebrow">Codex Runs · 北京时间</p>
+      <h2>进度状态</h2>
+    </div>
+    <button type="button" class="progress-close" id="progress-close" aria-label="关闭进度状态">×</button>
+  </div>
+  <div class="progress-summary" id="progress-summary"></div>
+  <div class="progress-list" id="progress-list"></div>
+  <p class="progress-foot">执行态由服务端写入 runs 表，前端通过 SSE 实时接收。</p>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

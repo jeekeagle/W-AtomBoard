@@ -1,0 +1,38 @@
+{
+  "name": "watomboard",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "写作版写作原子看板：一个 Atom 是一个选题或章节，交给 Codex 写作，稿件、字数与进度自动回写。",
+  "bin": {
+    "watomboard": "bin/watomboard.mjs"
+  },
+  "scripts": {
+    "board": "node bin/watomboard.mjs",
+    "serve": "node bin/watomboard.mjs serve",
+    "start": "node bin/watomboard.mjs serve",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeekeagle/W-AtomBoard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jeekeagle/W-AtomBoard/issues"
+  },
+  "homepage": "https://github.com/jeekeagle/W-AtomBoard#readme",
+  "keywords": [
+    "watomboard",
+    "writing",
+    "manuscript",
+    "codex",
+    "agent",
+    "kanban",
+    "local-first",
+    "sqlite",
+    "getnote"
+  ]
+}

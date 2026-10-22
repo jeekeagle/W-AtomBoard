@@ -1,0 +1,27 @@
+{
+  "defaultStyle": "editorial",
+  "defaultTheme": "white",
+  "styles": [
+    {
+      "slug": "editorial",
+      "name": "编辑杂志风",
+      "source": "/styles/editorial",
+      "reference": "styles/editorial.md",
+      "description": "纯单色、衬线标题、发丝线分隔、克制的交互。禁止彩色强调、阴影、渐变与元素堆积。",
+      "rules": {
+        "noAccentColor": true,
+        "noShadow": true,
+        "noGradient": true,
+        "noLargeRadius": true,
+        "headingFont": "serif",
+        "bodyFont": "sans"
+      },
+      "default": true
+    }
+  ],
+  "themes": [
+    { "slug": "white", "name": "白色", "default": true },
+    { "slug": "cream", "name": "暖米" },
+    { "slug": "ink",   "name": "墨色" }
+  ]
+}
